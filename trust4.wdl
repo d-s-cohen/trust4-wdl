@@ -135,7 +135,7 @@ workflow trust4_wf {
     File? rnaseq_aligned_bam
     File? left_fq
     File? right_fq
-	String? Docker = "nciccbr/ccbr_trust4:v1.0.2-beta"
+    String? Docker = "nciccbr/ccbr_trust4:v1.0.2-beta"
     Int preemptible = 2
     Int maxRetries = 1
 
