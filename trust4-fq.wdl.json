@@ -1,0 +1,5 @@
+{
+    "trust4_wf.left_fq": "sample_1.fastq.gz",
+    "trust4_wf.right_fq": "sample_2.fastq.gz",
+    "trust4_wf.sample_name": "sample"
+  }

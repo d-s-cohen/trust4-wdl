@@ -1,0 +1,4 @@
+{
+    "trust4_wf.rnaseq_aligned_bam": "sample.bam",
+    "trust4_wf.sample_name": "sample"
+  }
