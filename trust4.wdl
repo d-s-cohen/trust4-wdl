@@ -1,4 +1,4 @@
-task TRUST4_TASK {
+task TRUST4_BULK_TASK {
 
     File? gene_reference
     File? gene_annotation
@@ -54,15 +54,19 @@ task TRUST4_TASK {
             -o ${sample_name}
 
     fi
+
+    gzip ${sample_name}_annot.fa
+    gzip ${sample_name}_cdr3.out
+    gzip ${sample_name}_report.tsv
       
    >>>
     
     output {
-      File report="${sample_name}_cdr3.out"
-      File simpleReport="${sample_name}_report.tsv"
+      File annot="${sample_name}_annot.fa.gz"
+      File report="${sample_name}_cdr3.out.gz"
+      File simpleReport="${sample_name}_report.tsv.gz"
    }
    
-
     runtime {
             docker: Docker
             disks: "local-disk 500 SSD"
@@ -71,11 +75,78 @@ task TRUST4_TASK {
             preemptible: preemptible
             maxRetries: maxRetries
     }
-    
-
 
 }
 
+
+task TRUST4_SMART_TASK {
+
+    File? gene_reference
+    File? gene_annotation
+    String sample_name
+    Array[File]? smart_1
+    Array[File]? smart_2
+    String Docker
+    Int preemptible
+    Int maxRetries
+
+    Boolean defined_smart_2 = defined(smart_2)
+    
+    String dollar = "$"
+    
+    command <<<
+
+    set -e
+
+    # define reference files
+
+    if [[ -z "${gene_reference}" ]]; then
+        gene_reference="/opt2/TRUST4/hg38_bcrtcr.fa"
+    fi
+
+    if [[ -z "${gene_annotation}" ]]; then
+        gene_annotation="/opt2/TRUST4/human_IMGT+C.fa"
+    fi
+
+    # trust4
+
+    if [ "${defined_smart_2}" = true ]; then
+        perl /opt2/TRUST4/trust-smartseq.pl \
+            -1 "${write_lines(smart_1)}" \
+            -2 "${write_lines(smart_2)}" \
+            -t 8 \
+            -f ${dollar}{gene_reference} \
+            --ref ${dollar}{gene_annotation} \
+            -o ${sample_name}
+    else
+        perl /opt2/TRUST4/trust-smartseq.pl \
+            -1 "${write_lines(smart_1)}" \
+            -t 8 \
+            -f ${dollar}{gene_reference} \
+            --ref ${dollar}{gene_annotation} \
+            -o ${sample_name}
+    fi
+
+    gzip ${sample_name}_annot.fa
+    gzip ${sample_name}_report.tsv
+
+   >>>
+    
+    output {
+      File annot="${sample_name}_annot.fa.gz"
+      File simpleReport="${sample_name}_report.tsv.gz"
+   }
+   
+    runtime {
+            docker: Docker
+            disks: "local-disk 500 SSD"
+            memory: "20GB"
+            cpu: "8"
+            preemptible: preemptible
+            maxRetries: maxRetries
+    }
+
+}
 
 workflow trust4_wf {
 
@@ -85,12 +156,14 @@ workflow trust4_wf {
     File? bam
     File? fq_1
     File? fq_2
+    Array[File]? smart_1
+    Array[File]? smart_2
     String? Docker = "nciccbr/ccbr_trust4:v1.0.2-beta"
     Int preemptible = 2
     Int maxRetries = 1
 
     if (defined(bam)||defined(fq_1)) {
-        call TRUST4_TASK {
+        call TRUST4_BULK_TASK {
             input:
                 input_bam=bam,
                 fq_1=fq_1,
@@ -103,6 +176,19 @@ workflow trust4_wf {
                 maxRetries=maxRetries
         }
     }
+
+    if ((defined(smart_1))&&(!(defined(bam)||defined(fq_1)))) {
+        call TRUST4_SMART_TASK {
+            input:
+                smart_1=smart_1,
+                smart_2=smart_2,
+                sample_name=sample_name,
+                gene_reference=gene_reference,
+                gene_annotation=gene_annotation,
+                Docker=Docker,
+                preemptible=preemptible,
+                maxRetries=maxRetries
+        }
+    }
+
 }
-
-

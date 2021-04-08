@@ -1,0 +1,5 @@
+{
+    "trust4_wf.smart_1": ["cell1_1.fastq.gz", "cell2_1.fastq.gz", "cell3_1.fastq.gz"],
+    "trust4_wf.smart_2": ["cell1_2.fastq.gz", "cell2_2.fastq.gz", "cell3_2.fastq.gz"],
+    "trust4_wf.sample_name": "example"
+  }
