@@ -20,11 +20,15 @@ task TRUST4_BULK_TASK {
     # define reference files
 
     if [[ -z "${gene_reference}" ]]; then
-        gene_reference="/opt2/TRUST4/hg38_bcrtcr.fa"
+        gene_reference_run="/opt2/TRUST4/hg38_bcrtcr.fa"
+    else
+        gene_reference_run="${gene_reference}"
     fi
 
     if [[ -z "${gene_annotation}" ]]; then
-        gene_annotation="/opt2/TRUST4/human_IMGT+C.fa"
+        gene_annotation_run="/opt2/TRUST4/human_IMGT+C.fa"
+    else
+        gene_annotation_run="${gene_annotation}"
     fi
 
     # check 10x
@@ -39,19 +43,19 @@ task TRUST4_BULK_TASK {
 
     if [[ ! -z "${input_bam}" ]]; then
         run-trust4 \
-        -b ${input_bam} \
-        -t 8 \
-        ${dollar}{support_barcode_10x} \
-        -f ${dollar}{gene_reference} \
-        --ref ${dollar}{gene_annotation} \
-        -o ${sample_name}
+            -b ${input_bam} \
+            -t 8 \
+            ${dollar}{support_barcode_10x} \
+            -f ${dollar}{gene_reference_run} \
+            --ref ${dollar}{gene_annotation_run} \
+            -o ${sample_name}
 
     elif [[ -z "${fq_2}" ]]; then
         run-trust4 \
             -u ${fq_1} \
             -t 8 \
-            -f ${dollar}{gene_reference} \
-            --ref ${dollar}{gene_annotation} \
+            -f ${dollar}{gene_reference_run} \
+            --ref ${dollar}{gene_annotation_run} \
             -o ${sample_name}
 
     else
@@ -59,8 +63,8 @@ task TRUST4_BULK_TASK {
             -1 ${fq_1} \
             -2 ${fq_2} \
             -t 8 \
-            -f ${dollar}{gene_reference} \
-            --ref ${dollar}{gene_annotation} \
+            -f ${dollar}{gene_reference_run} \
+            --ref ${dollar}{gene_annotation_run} \
             -o ${sample_name}
 
     fi
@@ -116,11 +120,15 @@ task TRUST4_SMART_TASK {
     # define reference files
 
     if [[ -z "${gene_reference}" ]]; then
-        gene_reference="/opt2/TRUST4/hg38_bcrtcr.fa"
+        gene_reference_run="/opt2/TRUST4/hg38_bcrtcr.fa"
+    else
+        gene_reference_run="${gene_reference}"
     fi
 
     if [[ -z "${gene_annotation}" ]]; then
-        gene_annotation="/opt2/TRUST4/human_IMGT+C.fa"
+        gene_annotation_run="/opt2/TRUST4/human_IMGT+C.fa"
+    else
+        gene_annotation_run="${gene_annotation}"
     fi
 
     # trust4
@@ -130,15 +138,15 @@ task TRUST4_SMART_TASK {
             -1 "${write_lines(smart_1)}" \
             -2 "${write_lines(smart_2)}" \
             -t 8 \
-            -f ${dollar}{gene_reference} \
-            --ref ${dollar}{gene_annotation} \
+            -f ${dollar}{gene_reference_run} \
+            --ref ${dollar}{gene_annotation_run} \
             -o ${sample_name}
     else
         perl /opt2/TRUST4/trust-smartseq.pl \
             -1 "${write_lines(smart_1)}" \
             -t 8 \
-            -f ${dollar}{gene_reference} \
-            --ref ${dollar}{gene_annotation} \
+            -f ${dollar}{gene_reference_run} \
+            --ref ${dollar}{gene_annotation_run} \
             -o ${sample_name}
     fi
 
