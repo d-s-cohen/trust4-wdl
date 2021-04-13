@@ -6,6 +6,7 @@ task TRUST4_BULK_TASK {
     File? input_bam
     File? fq_1
     File? fq_2
+    String? barcode_10x
     String Docker
     Int preemptible
     Int maxRetries
@@ -26,12 +27,21 @@ task TRUST4_BULK_TASK {
         gene_annotation="/opt2/TRUST4/human_IMGT+C.fa"
     fi
 
+    # check 10x
+
+    if [[ ! -z "${barcode_10x}" ]]; then
+        support_barcode_10x="--barcode ${barcode_10x}"
+    else   
+        support_barcode_10x=""
+    fi
+
     # trust4
 
     if [[ ! -z "${input_bam}" ]]; then
         run-trust4 \
         -b ${input_bam} \
         -t 8 \
+        ${dollar}{support_barcode_10x} \
         -f ${dollar}{gene_reference} \
         --ref ${dollar}{gene_annotation} \
         -o ${sample_name}
@@ -58,6 +68,10 @@ task TRUST4_BULK_TASK {
     gzip ${sample_name}_annot.fa
     gzip ${sample_name}_cdr3.out
     gzip ${sample_name}_report.tsv
+
+    if [[ ! -z "${barcode_10x}" ]]; then
+        gzip ${sample_name}_barcode_report.tsv
+    fi
       
    >>>
     
@@ -65,6 +79,7 @@ task TRUST4_BULK_TASK {
       File annot="${sample_name}_annot.fa.gz"
       File report="${sample_name}_cdr3.out.gz"
       File simpleReport="${sample_name}_report.tsv.gz"
+      File? barcodeReport="${sample_name}_barcode_report.tsv.gz"
    }
    
     runtime {
@@ -158,6 +173,7 @@ workflow trust4_wf {
     File? fq_2
     Array[File]? smart_1
     Array[File]? smart_2
+    String? barcode_10x
     String? Docker = "nciccbr/ccbr_trust4:v1.0.2-beta"
     Int preemptible = 2
     Int maxRetries = 1
@@ -169,6 +185,7 @@ workflow trust4_wf {
                 fq_1=fq_1,
                 fq_2=fq_2,
                 sample_name=sample_name,
+                barcode_10x=barcode_10x,
                 gene_reference=gene_reference,
                 gene_annotation=gene_annotation,
                 Docker=Docker,
