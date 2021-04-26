@@ -1,6 +1,6 @@
 # TRUST4 Dockerfile
 # Define release with --build-arg TRUST4_VERSION=$RELEASE_VERSION
-# Adapted from skchronicles's Dockerfile https://github.com/CCBR/Dockers/tree/master/rnaseq/ccbr_trust4. Thank you.
+# Sourced from skchronicles's Dockerfile https://github.com/CCBR/Dockers/tree/master/rnaseq/ccbr_trust4. Thank you.
 
 # Overview of TRUST4 Dependencies
 # 1. pthreads (bundled with OS)
