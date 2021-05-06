@@ -182,7 +182,7 @@ workflow trust4_wf {
     Array[File]? smart_1
     Array[File]? smart_2
     String? barcode_10x
-    String? Docker = "nciccbr/ccbr_trust4:v1.0.2-beta"
+    String? Docker = "dscohen/trust4:v1.0.2"
     Int preemptible = 2
     Int maxRetries = 1
 
