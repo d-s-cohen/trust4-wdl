@@ -10,6 +10,9 @@ task TRUST4_BULK_TASK {
     String Docker
     Int preemptible
     Int maxRetries
+    String memory
+    String disks
+    Int cpu
     
     String dollar = "$"
     
@@ -44,7 +47,7 @@ task TRUST4_BULK_TASK {
     if [[ ! -z "${input_bam}" ]]; then
         run-trust4 \
             -b ${input_bam} \
-            -t 8 \
+            -t ${cpu} \
             ${dollar}{support_barcode_10x} \
             -f ${dollar}{gene_reference_run} \
             --ref ${dollar}{gene_annotation_run} \
@@ -53,7 +56,7 @@ task TRUST4_BULK_TASK {
     elif [[ -z "${fq_2}" ]]; then
         run-trust4 \
             -u ${fq_1} \
-            -t 8 \
+            -t ${cpu} \
             -f ${dollar}{gene_reference_run} \
             --ref ${dollar}{gene_annotation_run} \
             -o ${sample_name}
@@ -62,7 +65,7 @@ task TRUST4_BULK_TASK {
         run-trust4 \
             -1 ${fq_1} \
             -2 ${fq_2} \
-            -t 8 \
+            -t ${cpu} \
             -f ${dollar}{gene_reference_run} \
             --ref ${dollar}{gene_annotation_run} \
             -o ${sample_name}
@@ -88,9 +91,9 @@ task TRUST4_BULK_TASK {
    
     runtime {
             docker: Docker
-            disks: "local-disk 500 SSD"
-            memory: "20GB"
-            cpu: "8"
+            disks: disks
+            memory: memory
+            cpu: cpu
             preemptible: preemptible
             maxRetries: maxRetries
     }
@@ -108,6 +111,9 @@ task TRUST4_SMART_TASK {
     String Docker
     Int preemptible
     Int maxRetries
+    String memory
+    String disks
+    Int cpu
 
     Boolean defined_smart_2 = defined(smart_2)
     
@@ -137,14 +143,14 @@ task TRUST4_SMART_TASK {
         perl /opt2/TRUST4/trust-smartseq.pl \
             -1 "${write_lines(smart_1)}" \
             -2 "${write_lines(smart_2)}" \
-            -t 8 \
+            -t ${cpu} \
             -f ${dollar}{gene_reference_run} \
             --ref ${dollar}{gene_annotation_run} \
             -o ${sample_name}
     else
         perl /opt2/TRUST4/trust-smartseq.pl \
             -1 "${write_lines(smart_1)}" \
-            -t 8 \
+            -t ${cpu} \
             -f ${dollar}{gene_reference_run} \
             --ref ${dollar}{gene_annotation_run} \
             -o ${sample_name}
@@ -162,9 +168,9 @@ task TRUST4_SMART_TASK {
    
     runtime {
             docker: Docker
-            disks: "local-disk 500 SSD"
-            memory: "20GB"
-            cpu: "8"
+            disks: disks
+            memory: memory
+            cpu: cpu
             preemptible: preemptible
             maxRetries: maxRetries
     }
@@ -185,6 +191,9 @@ workflow trust4_wf {
     String? Docker = "dscohen/trust4:v1.0.2"
     Int preemptible = 2
     Int maxRetries = 1
+    String memory = "10GB"
+    String disks = "local-disk 15 SSD"
+    Int cpu = "8"
 
     if (defined(bam)||defined(fq_1)) {
         call TRUST4_BULK_TASK {
@@ -198,7 +207,10 @@ workflow trust4_wf {
                 gene_annotation=gene_annotation,
                 Docker=Docker,
                 preemptible=preemptible,
-                maxRetries=maxRetries
+                maxRetries=maxRetries,
+                disks=disks,
+                memory=memory,
+                cpu=cpu
         }
     }
 
@@ -212,7 +224,10 @@ workflow trust4_wf {
                 gene_annotation=gene_annotation,
                 Docker=Docker,
                 preemptible=preemptible,
-                maxRetries=maxRetries
+                maxRetries=maxRetries,
+                disks=disks,
+                memory=memory,
+                cpu=cpu
         }
     }
 
