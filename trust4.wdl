@@ -188,11 +188,11 @@ workflow trust4_wf {
     Array[File]? smart_1
     Array[File]? smart_2
     String? barcode_10x
-    String? Docker = "dscohen/trust4:v1.0.2"
+    String? Docker = "dscohen/trust4:v1.0.4"
     Int preemptible = 2
     Int maxRetries = 1
     String memory = "10GB"
-    String disks = "local-disk 15 SSD"
+    String disks = "local-disk 20 SSD"
     Int cpu = "8"
 
     if (defined(bam)||defined(fq_1)) {

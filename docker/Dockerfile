@@ -16,8 +16,8 @@ FROM ubuntu:18.04
 MAINTAINER d-s-cohen
 
 # Setting build time arg for defining a release
-# Default = 1.0.2  
-ARG TRUST4_VERSION=1.0.2
+# Default = 1.0.4  
+ARG TRUST4_VERSION=1.0.4
 
 RUN mkdir -p /data2
 RUN mkdir -p /opt2
