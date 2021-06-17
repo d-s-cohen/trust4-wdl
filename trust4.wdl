@@ -2,7 +2,7 @@ task TRUST4_BULK_TASK {
 
     File? gene_reference
     File? gene_annotation
-    String sample_name
+    String sample_id
     File? input_bam
     File? fq_1
     File? fq_2
@@ -51,7 +51,7 @@ task TRUST4_BULK_TASK {
             ${dollar}{support_barcode_10x} \
             -f ${dollar}{gene_reference_run} \
             --ref ${dollar}{gene_annotation_run} \
-            -o ${sample_name}
+            -o ${sample_id}
 
     elif [[ -z "${fq_2}" ]]; then
         run-trust4 \
@@ -59,7 +59,7 @@ task TRUST4_BULK_TASK {
             -t ${cpu} \
             -f ${dollar}{gene_reference_run} \
             --ref ${dollar}{gene_annotation_run} \
-            -o ${sample_name}
+            -o ${sample_id}
 
     else
         run-trust4 \
@@ -68,25 +68,25 @@ task TRUST4_BULK_TASK {
             -t ${cpu} \
             -f ${dollar}{gene_reference_run} \
             --ref ${dollar}{gene_annotation_run} \
-            -o ${sample_name}
+            -o ${sample_id}
 
     fi
 
-    gzip ${sample_name}_annot.fa
-    gzip ${sample_name}_cdr3.out
-    gzip ${sample_name}_report.tsv
+    gzip ${sample_id}_annot.fa
+    gzip ${sample_id}_cdr3.out
+    gzip ${sample_id}_report.tsv
 
     if [[ ! -z "${barcode_10x}" ]]; then
-        gzip ${sample_name}_barcode_report.tsv
+        gzip ${sample_id}_barcode_report.tsv
     fi
       
    >>>
     
     output {
-      File annot="${sample_name}_annot.fa.gz"
-      File report="${sample_name}_cdr3.out.gz"
-      File simpleReport="${sample_name}_report.tsv.gz"
-      File? barcodeReport="${sample_name}_barcode_report.tsv.gz"
+      File annot="${sample_id}_annot.fa.gz"
+      File report="${sample_id}_cdr3.out.gz"
+      File simpleReport="${sample_id}_report.tsv.gz"
+      File? barcodeReport="${sample_id}_barcode_report.tsv.gz"
    }
    
     runtime {
@@ -105,7 +105,7 @@ task TRUST4_SMART_TASK {
 
     File? gene_reference
     File? gene_annotation
-    String sample_name
+    String sample_id
     Array[File]? smart_1
     Array[File]? smart_2
     String Docker
@@ -146,24 +146,24 @@ task TRUST4_SMART_TASK {
             -t ${cpu} \
             -f ${dollar}{gene_reference_run} \
             --ref ${dollar}{gene_annotation_run} \
-            -o ${sample_name}
+            -o ${sample_id}
     else
         perl /opt2/TRUST4/trust-smartseq.pl \
             -1 "${write_lines(smart_1)}" \
             -t ${cpu} \
             -f ${dollar}{gene_reference_run} \
             --ref ${dollar}{gene_annotation_run} \
-            -o ${sample_name}
+            -o ${sample_id}
     fi
 
-    gzip ${sample_name}_annot.fa
-    gzip ${sample_name}_report.tsv
+    gzip ${sample_id}_annot.fa
+    gzip ${sample_id}_report.tsv
 
    >>>
     
     output {
-      File annot="${sample_name}_annot.fa.gz"
-      File simpleReport="${sample_name}_report.tsv.gz"
+      File annot="${sample_id}_annot.fa.gz"
+      File simpleReport="${sample_id}_report.tsv.gz"
    }
    
     runtime {
@@ -179,7 +179,7 @@ task TRUST4_SMART_TASK {
 
 workflow trust4_wf {
 
-    String sample_name
+    String sample_id
     File? gene_reference
     File? gene_annotation
     File? bam
@@ -201,7 +201,7 @@ workflow trust4_wf {
                 input_bam=bam,
                 fq_1=fq_1,
                 fq_2=fq_2,
-                sample_name=sample_name,
+                sample_id=sample_id,
                 barcode_10x=barcode_10x,
                 gene_reference=gene_reference,
                 gene_annotation=gene_annotation,
@@ -219,7 +219,7 @@ workflow trust4_wf {
             input:
                 smart_1=smart_1,
                 smart_2=smart_2,
-                sample_name=sample_name,
+                sample_id=sample_id,
                 gene_reference=gene_reference,
                 gene_annotation=gene_annotation,
                 Docker=Docker,

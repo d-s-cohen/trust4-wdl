@@ -1,4 +1,4 @@
 {
     "trust4_wf.bam": "example.bam",
-    "trust4_wf.sample_name": "example"
+    "trust4_wf.sample_id": "example"
   }
