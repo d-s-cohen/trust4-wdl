@@ -1,4 +1,4 @@
-task TRUST4_BULK_TASK {
+task TRUST4_TASK {
 
     File? gene_reference
     File? gene_annotation
@@ -196,7 +196,7 @@ workflow trust4_wf {
     Int cpu = "8"
 
     if (defined(bam)||defined(fq_1)) {
-        call TRUST4_BULK_TASK {
+        call TRUST4_TASK {
             input:
                 input_bam=bam,
                 fq_1=fq_1,
